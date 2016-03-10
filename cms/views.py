@@ -132,7 +132,7 @@ def details(request, slug):
         if app_urls and not skip_app:
             app = apphook_pool.get_apphook(app_urls)
             pattern_list = []
-            for urlpatterns in get_app_urls(app.urls):
+            for urlpatterns in get_app_urls(app.get_urls(page)):
                 pattern_list += urlpatterns
             try:
                 view, args, kwargs = resolve('/', tuple(pattern_list))
