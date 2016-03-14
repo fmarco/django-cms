@@ -279,6 +279,17 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'inherit':'layout/home.html main',
                 'limits': {},
             },
+            '*': {
+                'name': u'All',
+                'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin',],
+                'inherit':'layout/home.html main',
+                'limits': {},
+            },
+            'foo-*': {
+                'name': u'All',
+                'plugins': ['TextPlugin', 'LinkPlugin',],
+                'limits': {},
+            },
         }
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             #test no inheritance
@@ -293,6 +304,12 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             #test grandparent inherited value
             returned = get_placeholder_conf('default_plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
+            #test generic configuration
+            returned = get_placeholder_conf('plugins', 'something')
+            self.assertEqual(returned, TEST_CONF['*']['plugins'])
+            #test regex
+            returned = get_placeholder_conf('plugins', 'foo')
+            self.assertEqual(returned, TEST_CONF['foo-*']['plugins'])
 
     def test_placeholder_context_leaking(self):
         TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}
