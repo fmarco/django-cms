@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import operator
+import re
 import warnings
 
 from django.conf import settings
@@ -35,6 +36,13 @@ def get_context():
         return {}
 
 
+def turn_into_regex(to_regex=''):
+    to_regex = ''.join(('^', to_regex, '$'))
+    to_regex = to_regex.replace('*', '.*')
+    to_regex = re.compile(to_regex)
+    return to_regex
+
+
 def get_placeholder_conf(setting, placeholder, template=None, default=None):
     """
     Returns the placeholder configuration for a given setting. The key would for
@@ -49,14 +57,54 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     """
     if placeholder:
         keys = []
+        placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
+        placeholder_confs = {
+            1: [], # template placeholder
+            2: [], # placeholder
+            3: [] # template
+        }
+        # regex definitions
+        regex_space = '\s+?'
+        regex_template = '.+?\.html'
+        regex_placeholder = '[\w]+?'
+        # regex groups
+        template_placeholder_regex = re.compile('^{0}{1}{2}$'.format(regex_template, regex_space, regex_placeholder))
+        placeholder_regex = re.compile('^{0}$'.format(regex_placeholder))
+        template_regex = re.compile('^{0}$'.format(regex_template))
+        # group regex by type
+        for rgx in placeholder_conf.keys():
+            if template_placeholder_regex.match(rgx):
+                placeholder_confs[1].append((rgx, turn_into_regex(rgx)))
+            elif placeholder_regex.match(rgx):
+                placeholder_confs[2].append((rgx, turn_into_regex(rgx)))
+            elif template_regex.match(rgx):
+                placeholder_confs[3].append((rgx, turn_into_regex(rgx)))
+        # 1st level
         if template:
             keys.append("%s %s" % (template, placeholder))
-        keys.append(placeholder)
+        # 2nd level re.compile('^[\w]+?$')
+        keys.append(str(placeholder))
+        # 3rd level re.compile('^.+?\.html$')
         if template:
-            keys.append(template)
+            keys.append(str(template))
+        # 4th level
         keys.append('*')
+        # turn placeholder confs keys into real regular expressions
         for key in keys:
-            conf = get_cms_setting('PLACEHOLDER_CONF').get(key)
+            # turn them in real regex string
+            conf = None
+            if key != '*':
+                for idx in range(1, len(placeholder_confs.keys()) - 1):
+                    for regex in placeholder_confs[idx]:
+                        if regex[1].match(key):
+                            conf = placeholder_conf.get(regex[0])
+                            if not conf:
+                                continue
+                            value = conf.get(setting)
+                            if value is not None:
+                                return value
+            else:
+                conf = placeholder_conf.get(key)
             if not conf:
                 continue
             value = conf.get(setting)
