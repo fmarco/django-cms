@@ -38,7 +38,7 @@ def get_context():
 
 def turn_into_regex(to_regex=''):
     to_regex = ''.join(('^', to_regex, '$'))
-    to_regex = to_regex.replace('*', '.*')
+    to_regex = to_regex.replace('*', '.*?')
     to_regex = re.compile(to_regex)
     return to_regex
 
@@ -66,19 +66,20 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         # regex definitions
         regex_space = '\s+?'
         regex_template = '.+?\.html'
-        regex_placeholder = '[\w]+?'
+        regex_placeholder = '.+?'
         # regex groups
         template_placeholder_regex = re.compile('^{0}{1}{2}$'.format(regex_template, regex_space, regex_placeholder))
         placeholder_regex = re.compile('^{0}$'.format(regex_placeholder))
         template_regex = re.compile('^{0}$'.format(regex_template))
         # group regex by type
         for rgx in placeholder_conf.keys():
-            if template_placeholder_regex.match(rgx):
-                placeholder_confs[1].append((rgx, turn_into_regex(rgx)))
-            elif placeholder_regex.match(rgx):
-                placeholder_confs[2].append((rgx, turn_into_regex(rgx)))
-            elif template_regex.match(rgx):
-                placeholder_confs[3].append((rgx, turn_into_regex(rgx)))
+            if rgx != '*':
+                if template_placeholder_regex.match(rgx):
+                    placeholder_confs[1].append((rgx, turn_into_regex(rgx)))
+                elif placeholder_regex.match(rgx):
+                    placeholder_confs[2].append((rgx, turn_into_regex(rgx)))
+                elif template_regex.match(rgx):
+                    placeholder_confs[3].append((rgx, turn_into_regex(rgx)))
         # 1st level
         if template:
             keys.append("%s %s" % (template, placeholder))
@@ -94,7 +95,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
             # turn them in real regex string
             conf = None
             if key != '*':
-                for idx in range(1, len(placeholder_confs.keys()) - 1):
+                for idx in range(1, len(placeholder_confs.keys()) + 1 ):
                     for regex in placeholder_confs[idx]:
                         if regex[1].match(key):
                             conf = placeholder_conf.get(regex[0])

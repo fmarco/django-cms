@@ -281,13 +281,18 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             },
             '*': {
                 'name': u'All',
-                'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin',],
+                'plugins': ['FilerImagePlugin', 'LinkPlugin',],
                 'inherit':'layout/home.html main',
                 'limits': {},
             },
             'foo-*': {
-                'name': u'All',
+                'name': u'Foo type',
                 'plugins': ['TextPlugin', 'LinkPlugin',],
+                'limits': {},
+            },
+            '*foo-*': {
+                'name': u'Random head Foo type',
+                'plugins': ['FilerImagePlugin',],
                 'limits': {},
             },
         }
@@ -308,8 +313,10 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             returned = get_placeholder_conf('plugins', 'something')
             self.assertEqual(returned, TEST_CONF['*']['plugins'])
             #test regex
-            returned = get_placeholder_conf('plugins', 'foo')
+            returned = get_placeholder_conf('plugins', 'foo-one')
             self.assertEqual(returned, TEST_CONF['foo-*']['plugins'])
+            returned = get_placeholder_conf('plugins', 'somethingfoo-one')
+            self.assertEqual(returned, TEST_CONF['*foo-*']['plugins'])
 
     def test_placeholder_context_leaking(self):
         TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}
