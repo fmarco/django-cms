@@ -80,6 +80,12 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
                     placeholder_confs[2].append((rgx, turn_into_regex(rgx)))
                 elif template_regex.match(rgx):
                     placeholder_confs[3].append((rgx, turn_into_regex(rgx)))
+        placeholder_confs[1].sort()
+        placeholder_confs[2].sort()
+        placeholder_confs[3].sort()
+        placeholder_confs[1].reverse()
+        placeholder_confs[2].reverse()
+        placeholder_confs[3].reverse()
         # 1st level
         if template:
             keys.append("%s %s" % (template, placeholder))
