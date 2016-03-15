@@ -295,6 +295,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'plugins': ['FilerImagePlugin',],
                 'limits': {},
             },
+            '*fo*o-*': {
+                'name': u'Very Random head Foo type',
+                'plugins': ['LinkPlugin',],
+                'limits': {},
+            },
+            'fo*o-*': {
+                'name': u'Very Random head Foo type again',
+                'plugins': ['TextPlugin',],
+                'limits': {},
+            },
         }
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             #test no inheritance
@@ -317,6 +327,8 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(returned, TEST_CONF['foo-*']['plugins'])
             returned = get_placeholder_conf('plugins', 'somethingfoo-one')
             self.assertEqual(returned, TEST_CONF['*foo-*']['plugins'])
+            returned = get_placeholder_conf('plugins', 'foosomethingfoo-one')
+            self.assertEqual(returned, TEST_CONF['*fo*o-*']['plugins'])
 
     def test_placeholder_context_leaking(self):
         TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}
