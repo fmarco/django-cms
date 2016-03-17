@@ -2,6 +2,9 @@
 import operator
 import re
 import warnings
+from collections import namedtuple
+from itertools import chain
+from operator import attrgetter
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -55,37 +58,18 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     CMS_PLACEHOLDER_CONF['placeholder']
     CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
     """
+    # Ideas: 
+    # 1)using real regex as keys
+    # 2)turn the setting in an orderedict
+    # 3)handling dictionary and list both
+
+    # Use regex or normal string (in this case exact match)
+    # compatibility with old structure
+    # convert all to orderedict
+
     if placeholder:
         keys = []
         placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
-        placeholder_confs = {
-            1: [], # template placeholder
-            2: [], # placeholder
-            3: [] # template
-        }
-        # regex definitions
-        regex_space = '\s+?'
-        regex_template = '.+?\.html'
-        regex_placeholder = '.+?'
-        # regex groups
-        template_placeholder_regex = re.compile('^{0}{1}{2}$'.format(regex_template, regex_space, regex_placeholder))
-        placeholder_regex = re.compile('^{0}$'.format(regex_placeholder))
-        template_regex = re.compile('^{0}$'.format(regex_template))
-        # group regex by type
-        for rgx in placeholder_conf.keys():
-            if rgx != '*':
-                if template_placeholder_regex.match(rgx):
-                    placeholder_confs[1].append((rgx, turn_into_regex(rgx)))
-                elif placeholder_regex.match(rgx):
-                    placeholder_confs[2].append((rgx, turn_into_regex(rgx)))
-                elif template_regex.match(rgx):
-                    placeholder_confs[3].append((rgx, turn_into_regex(rgx)))
-        placeholder_confs[1].sort()
-        placeholder_confs[2].sort()
-        placeholder_confs[3].sort()
-        placeholder_confs[1].reverse()
-        placeholder_confs[2].reverse()
-        placeholder_confs[3].reverse()
         # 1st level
         if template:
             keys.append("%s %s" % (template, placeholder))
@@ -96,36 +80,27 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
             keys.append(str(template))
         # 4th level
         keys.append('*')
+
         # turn placeholder confs keys into real regular expressions
         for key in keys:
             # turn them in real regex string
-            conf = None
-            if key != '*':
-                for idx in range(1, len(placeholder_confs.keys()) + 1 ):
-                    for regex in placeholder_confs[idx]:
-                        if regex[1].match(key):
-                            conf = placeholder_conf.get(regex[0])
-                            if not conf:
-                                continue
-                            value = conf.get(setting)
-                            if value is not None:
-                                return value
-            else:
-                conf = placeholder_conf.get(key)
-            if not conf:
-                continue
-            value = conf.get(setting)
-            if value is not None:
-                return value
-            inherit = conf.get('inherit')
-            if inherit:
-                if ' ' in inherit:
-                    inherit = inherit.split(' ')
-                else:
-                    inherit = (None, inherit,)
-                value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
-                if value is not None:
-                    return value
+            for regex, conf in placeholder_conf.iteritems():
+                compiled_regex = re.compile(regex)
+                if compiled_regex.match(key):
+                    if not conf:
+                        continue
+                    value = conf.get(setting)
+                    if value is not None:
+                        return value
+                    inherit = conf.get('inherit')
+                    if inherit:
+                        if ' ' in inherit:
+                            inherit = inherit.split(' ')
+                        else:
+                            inherit = (None, inherit,)
+                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
+                        if value is not None:
+                            return value
     return default
 
 
