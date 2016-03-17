@@ -279,6 +279,11 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'inherit':'layout/home.html main',
                 'limits': {},
             },
+            '*': {
+                'name': u'All',
+                'plugins': ['FilerImagePlugin', 'LinkPlugin',],
+                'limits': {},
+            },
         }
 
         TEST_CONF_LIST = [
@@ -335,6 +340,8 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             returned = get_placeholder_conf('default_plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
             #test generic configuration
+            returned = get_placeholder_conf('plugins', 'something')
+            self.assertEqual(returned, TEST_CONF['*']['plugins'])
 
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF_LIST):
             #test no inheritance
