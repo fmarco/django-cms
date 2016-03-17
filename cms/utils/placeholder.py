@@ -85,6 +85,8 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         for key in keys:
             # turn them in real regex string
             for regex, conf in placeholder_conf.iteritems():
+                if regex == '*':
+                    regex = '\*'
                 compiled_regex = re.compile(regex)
                 if compiled_regex.match(key):
                     if not conf:
