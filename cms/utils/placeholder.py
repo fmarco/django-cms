@@ -2,9 +2,6 @@
 import operator
 import re
 import warnings
-from collections import namedtuple
-from itertools import chain
-from operator import attrgetter
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
