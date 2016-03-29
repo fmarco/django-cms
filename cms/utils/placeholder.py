@@ -12,6 +12,7 @@ from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
 from django.utils.encoding import force_text
+from django.utils.six import iteritems
 
 from sekizai.helpers import get_varname, is_variable_extend_node
 
@@ -81,7 +82,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         # turn placeholder confs keys into real regular expressions
         for key in keys:
             # turn them in real regex string
-            for regex, conf in placeholder_conf.iteritems():
+            for regex, conf in iteritems(placeholder_conf):
                 if regex == '*':
                     regex = '\*'
                 compiled_regex = re.compile(regex)
