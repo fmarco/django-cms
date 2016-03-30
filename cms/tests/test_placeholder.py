@@ -1489,7 +1489,7 @@ class PlaceholderConfTests(TestCase):
         page = create_page('page', 'col_two.html', 'en')
         placeholder = page.placeholders.get(slot='col_left')
         conf = {
-            'col_two': {
+            'col_two.html': {
                 'plugins': ['TextPlugin', 'LinkPlugin'],
             },
             'col_two.html col_left': {
@@ -1506,7 +1506,7 @@ class PlaceholderConfTests(TestCase):
         page = create_page('page', constants.TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
         placeholder = page.placeholders.get(slot='col_left')
         conf = {
-            'col_two': {
+            'col_two.html': {
                 'plugins': ['TextPlugin', 'LinkPlugin'],
             },
             'col_two.html col_left': {
