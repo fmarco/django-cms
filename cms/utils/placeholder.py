@@ -71,9 +71,9 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         # 1st level
         if template:
             keys.append("%s %s" % (template, placeholder))
-        # 2nd level re.compile('^[\w]+?$')
+        # 2nd level
         keys.append(str(placeholder))
-        # 3rd level re.compile('^.+?\.html$')
+        # 3rd level
         if template:
             keys.append(str(template))
         # 4th level
