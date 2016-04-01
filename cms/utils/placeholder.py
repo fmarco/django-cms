@@ -37,13 +37,6 @@ def get_context():
         return {}
 
 
-def turn_into_regex(to_regex=''):
-    to_regex = ''.join(('^', to_regex, '$'))
-    to_regex = to_regex.replace('*', '.*?')
-    to_regex = re.compile(to_regex)
-    return to_regex
-
-
 def get_placeholder_conf(setting, placeholder, template=None, default=None):
     """
     Returns the placeholder configuration for a given setting. The key would for
