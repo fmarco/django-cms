@@ -180,7 +180,7 @@ class PluginPool(object):
         allowed_plugins = list(set(allowed_plugins) - set(excluded_plugins))
         for plugin in plugins:
             include_plugin = False
-            excluded_plugin = False
+            exclude_plugin = False
             plugin_name = plugin.__name__
             if placeholder and not plugin.get_require_parent(placeholder, page):
                 include_plugin = not allowed_plugins and setting_key == "plugins" or plugin_name in allowed_plugins
