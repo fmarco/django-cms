@@ -305,17 +305,17 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'inherit':'layout/home.html main',
                 'limits': {},
             }),
-            ('^foo-.*?', {
+            ('^foo-.*?$', {
                 'name': u'Foo type',
                 'plugins': ['TextPlugin', 'LinkPlugin',],
                 'limits': {},
             }),
-            ('^.*?foo-.*?', {
+            ('^.*?foo-.*?$', {
                 'name': u'Random head Foo type',
                 'plugins': ['FilerImagePlugin',],
                 'limits': {},
             }),
-            ('.*', {
+            ('.*$', {
                 'name': u'All',
                 'plugins': ['FilerImagePlugin', 'LinkPlugin',],
                 'limits': {},
@@ -1491,7 +1491,7 @@ class PlaceholderConfTests(TestCase):
         page = create_page('page', 'col_two.html', 'en')
         placeholder = page.placeholders.get(slot='col_left')
         conf = {
-            'col_two.html': {
+            'col_two': {
                 'plugins': ['TextPlugin', 'LinkPlugin'],
             },
             'col_two.html col_left': {
@@ -1508,7 +1508,7 @@ class PlaceholderConfTests(TestCase):
         page = create_page('page', constants.TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
         placeholder = page.placeholders.get(slot='col_left')
         conf = {
-            'col_two.html': {
+            'col_two': {
                 'plugins': ['TextPlugin', 'LinkPlugin'],
             },
             'col_two.html col_left': {

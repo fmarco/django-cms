@@ -76,10 +76,15 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         for key in keys:
             # turn them in real regex string
             for regex, conf in iteritems(placeholder_conf):
-                if regex == '*':
-                    regex = '\*'
-                compiled_regex = re.compile(regex)
-                if compiled_regex.match(key):
+                has_conf = False
+                if '^' == regex[0] and '$' == regex[-1]:
+                    compiled_regex = re.compile(regex)
+                    if compiled_regex:
+                        has_conf = True
+                else:
+                    if key == regex or regex == '*':
+                        has_conf = True
+                if has_conf:
                     if not conf:
                         continue
                     value = conf.get(setting)
