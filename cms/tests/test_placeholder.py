@@ -315,7 +315,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'plugins': ['FilerImagePlugin',],
                 'limits': {},
             }),
-            ('.*$', {
+            ('^.*$', {
                 'name': u'All',
                 'plugins': ['FilerImagePlugin', 'LinkPlugin',],
                 'limits': {},

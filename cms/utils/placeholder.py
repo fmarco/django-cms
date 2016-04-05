@@ -71,20 +71,29 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
             keys.append(str(template))
         # 4th level
         keys.append('*')
-
+        for key in keys:
+            for regex, conf in iteritems(placeholder_conf):
+                if key == regex:
+                    if not conf:
+                        continue
+                    value = conf.get(setting)
+                    if value is not None:
+                        return value
+                    inherit = conf.get('inherit')
+                    if inherit:
+                        if ' ' in inherit:
+                            inherit = inherit.split(' ')
+                        else:
+                            inherit = (None, inherit,)
+                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
+                        if value is not None:
+                            return value
         # turn placeholder confs keys into real regular expressions
         for key in keys:
             # turn them in real regex string
             for regex, conf in iteritems(placeholder_conf):
-                has_conf = False
-                if '^' == regex[0] and '$' == regex[-1]:
-                    compiled_regex = re.compile(regex)
-                    if compiled_regex:
-                        has_conf = True
-                else:
-                    if key == regex or regex == '*':
-                        has_conf = True
-                if has_conf:
+                compiled_regex = re.compile(regex)
+                if compiled_regex.match(key):
                     if not conf:
                         continue
                     value = conf.get(setting)
